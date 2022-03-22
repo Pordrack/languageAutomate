@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Language automata</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Nunito&family=Raleway:wght@300&display=swap" rel="stylesheet"> 
+</head>
+<body>
+    <label for="regex">Regular expression:</label>
+    <input type="text" id="regex" name="regex" required maxlength="50" size="10">
+
+    <input id="generateAutomataButton" type="button" value="Generate automata">
+
+    <label for="word">Type here to see the automata react:</label>
+    <input type="text" id="word" name="word" size="10">
+
+    <div id="graphic">
+        <canvas id='mainCanva'>
+            Sorry, it seems your browser cannot display canvas :/, I cannot show the automata without a canva.
+        </canvas>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
