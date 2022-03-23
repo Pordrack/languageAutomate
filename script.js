@@ -249,11 +249,13 @@ function generateAutomata() {
             //Il y'ait un [ juste après un *...]
         }
 
+        //On gère les et les ou, ne fonctionne en coordination avec rien
         if(previousChar==',' || previousChar=="|"){
             states[currentState-1].transitions[0].characters.push(char)
             skipState=true;
         }
-
+        
+        //On gère les et et les ou, ne fonctionne en coordination avec rien
         if(char==',' || char=='|'){
             skipState=true;
         }
