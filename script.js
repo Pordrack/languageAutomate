@@ -249,6 +249,15 @@ function generateAutomata() {
             //Il y'ait un [ juste après un *...]
         }
 
+        if(previousChar==',' || previousChar=="|"){
+            states[currentState-1].transitions[0].characters.push(char)
+            skipState=true;
+        }
+
+        if(char==',' || char=='|'){
+            skipState=true;
+        }
+
         if(char=='['){
             //Si on est sur un [, on range l'état d'avant
             groupsToPrepare+=1;
@@ -368,6 +377,7 @@ function checkText(){
             //console.log(currentCheckedState);
             for (let transition of currentCheckedState.transitions) {
                 //console.log(transition);
+                console.log(transition.characters);
                 if (transition.characters.includes(char)) {
                     valid = true;
                     nextStates.push(transition.endState);
