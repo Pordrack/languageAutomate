@@ -7,6 +7,14 @@ const errorMessage=document.querySelector("#errorMessage");
 
 btn.addEventListener('click', generateAutomata);
 
+//https://love2dev.com/blog/javascript-remove-from-array/#remove-from-array-splice
+function arrayRemove(arr, value) { 
+    
+    return arr.filter(function(ele){ 
+        return ele != value; 
+    });
+}
+
 //Represente les fleches entres les ronds
 function Transition(startState, endState, characters) {
     this.startState = startState;
@@ -34,8 +42,13 @@ function Transition(startState, endState, characters) {
         endingPointY -= canvaBoundingBox.y;
 
         //On fait un point intermediaire pour "courber" la ligne
-        let angleBetweenTheTwo = Math.atan2(endingPointY - startingPointY, endingPointX - startingPointX);
+        let angleBetweenTheTwo = Math.atan2(endingPointY - startingPointY, endingPointX - startingPointX);   
         let distanceBetweenTheTwo = Math.sqrt((startingPointX - endingPointX) ** 2 + (startingPointY - endingPointY) ** 2);
+        
+        //On fait un cas particulier pour les boucle sur sois même, pour qu'elle pointe vers "l'exterieur" du cercle
+        if(distanceBetweenTheTwo==0)
+            angleBetweenTheTwo=startState.angle+0.5*Math.PI;
+        
         let ControlPointY = startingPointY + 0.5 * distanceBetweenTheTwo * Math.sin(angleBetweenTheTwo);
         let ControlPointX = startingPointX + 0.5 * distanceBetweenTheTwo * Math.cos(angleBetweenTheTwo);
         //On ajoute un offset a ces points intermediaires
@@ -116,6 +129,8 @@ function State(name, position, isFinal) {
     this.name = name;
     this.position = position;
     this.circleNode = null;
+    //L'angle de la circle node par rapport au centre du cercle (sert quand on fait une boucle sur sois a pointer vers l'exterieur)
+    this.angle;
 
     this.createNode = function () {
         this.circleNode = document.createElement("div");
@@ -135,6 +150,7 @@ function State(name, position, isFinal) {
         let coords = getPositionOnCircle(graphic, this.circleNode, angle);
         let x = coords[0];
         let y = coords[1];
+        this.angle=angle;
         this.circleNode.style.top = y + "px";
         this.circleNode.style.left = x + "px";
     }
@@ -164,8 +180,6 @@ states = [startState];
 currentState = 0;
 
 function clearAutomata() {
-    console.log("clearing automata");
-    console.log(states.length)
     for (let state of states) {
         state.deleteNode();
     }
@@ -309,38 +323,64 @@ function generateAutomata() {
 function checkText(){
     clearText();
     //On commence par le début
-    let currentCheckedState=startState;
-    console.log(currentCheckedState)
+    let currentCheckedStates=[startState];
     //Et par dire que tout va bien
     let valid=true;
+
     for (let char of inputWord.value) {
         //Dé qu'on doit prendre une branche, on part du principe que tout va mal
         valid=false
-        currentCheckedState.circleNode.classList.remove('active');
-        for(let transition of currentCheckedState.transitions){
-            if(transition.characters.includes(char)){
-                valid=true;
-                currentCheckedState=transition.endState;
-                //console.log(currentCheckedState)
-                console.log("test");
-                break;
+        //On nettoie egalement la liste des prochains états
+        let nextStates=[];
+
+        for (let currentCheckedState of currentCheckedStates) {
+            //console.log(currentCheckedState);
+            for (let transition of currentCheckedState.transitions) {
+                //console.log(transition);
+                if (transition.characters.includes(char)) {
+
+                    console.log(transition.endState);
+                    valid = true;
+                    nextStates.push(transition.endState);
+                }
             }
+
+            //On supprime l'état dut tableau après l'avoir checké
+            currentCheckedState.circleNode.classList.remove('active');
+            //currentCheckedStates = arrayRemove(currentCheckedStates, currentCheckedState)
         }
+
+        //On copie les valeurs de next states dans les états a checké a la prochaine itération
+        currentCheckedStates=nextStates.slice(0);
+
         if(!valid){
             break;
+        } 
+    }
+
+    
+    for(let currentCheckedState of currentCheckedStates){
+        if(currentCheckedState.circleNode!=null){
+            console.log(currentCheckedState)
+            currentCheckedState.circleNode.classList.add('active');
         }
     }
 
-    if(currentCheckedState.circleNode!=null){
-        currentCheckedState.circleNode.classList.add('active');
-    }
-
+    console.log(currentCheckedStates);
+    
     if(!valid){
         clearText();
     }
     
     //On regarde si on est a la fin valide, meme en prenant en compte la finalité de la condition
-    valid&=currentCheckedState.isFinal;
+    if(valid==true){
+        valid=false;
+        for(let currentCheckedState of currentCheckedStates){
+            if(currentCheckedState.isFinal)
+                valid=true;
+        }
+    }
+    
 
     //On change le look de l'input en fonction
     inputWord.classList.toggle("invalidInput",!valid);
