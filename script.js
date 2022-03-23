@@ -219,6 +219,11 @@ function generateAutomata() {
     //C'est ici qu'on stock un groupe de [] qui vient de s'achever, pour les + et moins qui seraient intéréssés
     let currentGroupOfState=null;
     let previousChar=null;
+    let willHaveToCreateShortcut=false;
+    //Va-t-on devoir creer un groupe ? Et combien ? Sert pour les [[ici]] truc imbriqué dé le début
+    let groupsToBegin=0;
+    //Pareil que celle du dessus mais pour le push de l'état juste avant le début
+    let groupsToPrepare=0;
 
     for (let char of inputAutomata.value) {
         //Si il est mis sur true a un moment (car un caractère est spécial, le caractère ne crééera pas d'état)
@@ -230,40 +235,35 @@ function generateAutomata() {
 
         if(previousChar=='['){
             //Si on est sur un [, on range l'état actuel
-            lastStates.push(newState);
-            lastFirstChar.push(char);
             //Et le char actuel
+            groupsToBegin+=1;
+            //On ne le fait pas maintenant car il faut commencer avec un état "valide", donc au cas ou il y'ait
+            //Un [ apres un [
         }
         
         if(previousChar=='*'){
             //Si le dernier modificateur était un *, on doit rajouter un raccourci
             //Au cas ou l'état d'avant le truc bouclé veuille le skipper
-            if(currentGroupOfState!=null){
-                currentGroupOfState.previousState.addTransition(newState,[char]);
-            }else{
-                states[currentState-1].addTransition(newState,[char]);
-                //En plus de skipper, si là on parle d'un état final alors on peut terminer sans boucler
-                //Malheuresement ça ne marche pas, car on ne set le final qu'après avoir scanné toute l'exp
-                if(newState.isFinal){
-                    states[currentState-1].isFinal=true;
-                    console.log("test");
-                }
-            }
+            willHaveToCreateShortcut=true;
+            //On ne le fait pas maintenant car le shortcut doit être créé sur un état "valide", donc au cas ou 
+            //Il y'ait un [ juste après un *...]
         }
 
         if(char=='['){
             //Si on est sur un [, on range l'état d'avant
-            lastPreviousStates.push(states[currentState]);
+            groupsToPrepare+=1;
+            //On ne le fait pas directement car il faut attendre qu'on ait arrêté avec les [[ ]] imbriqués
             //Puis on s'arrête, forcement
             skipState=true;
         }
 
-        if(char==']'){
+        if(char==']'){   
             //On verifie que des états ont bien été stockés, sinon erreur
             if(lastPreviousStates.length<=0){
                 errorMessage.classList.add("showing")
                 break;
             }
+            
             //Une fois la [ fini, on stock les états précédents et premiers stockés en dernier avat de les virer
             currentGroupOfState={
                 'previousState':lastPreviousStates.pop(),
@@ -296,6 +296,36 @@ function generateAutomata() {
             continue;
         }
 
+        if(willHaveToCreateShortcut){
+            if(currentGroupOfState!=null){
+                currentGroupOfState.previousState.addTransition(newState,[char]);
+            }else{
+                states[currentState-1].addTransition(newState,[char]);
+                //En plus de skipper, si là on parle d'un état final alors on peut terminer sans boucler
+                //Malheuresement ça ne marche pas, car on ne set le final qu'après avoir scanné toute l'exp
+                if(newState.isFinal){
+                    states[currentState-1].isFinal=true;
+                    console.log("test");
+                }
+            }
+            willHaveToCreateShortcut=false;
+        }
+
+        //On prepare le groupe autant de fois que necessaire (plus d'une fois si [[comme ça]])
+        for (let i = 0; i < groupsToPrepare; i++) {
+            lastPreviousStates.push(states[currentState]);
+        }
+        groupsToPrepare=0;
+
+        //On créé le groupe autant de fois que necessaire (plus d'une fois si [[comme ça]])
+        for (let i = 0; i < groupsToBegin; i++) {
+            console.log(char);
+            lastStates.push(newState);
+            lastFirstChar.push(char);
+            //console.log("began group !");
+        }
+        groupsToBegin=0;
+
         //Si on s'est pas servi du groupe d'état stocké maintenant c'est trop tard
         currentGroupOfState=null;
         //On lie l'ancien au nouveau de façon linéaire
@@ -305,6 +335,7 @@ function generateAutomata() {
         currentState = states.length - 1;
     }
 
+    console.log(lastStates)
 
     states[currentState].isFinal = true;
 
@@ -338,8 +369,6 @@ function checkText(){
             for (let transition of currentCheckedState.transitions) {
                 //console.log(transition);
                 if (transition.characters.includes(char)) {
-
-                    console.log(transition.endState);
                     valid = true;
                     nextStates.push(transition.endState);
                 }
@@ -361,12 +390,9 @@ function checkText(){
     
     for(let currentCheckedState of currentCheckedStates){
         if(currentCheckedState.circleNode!=null){
-            console.log(currentCheckedState)
             currentCheckedState.circleNode.classList.add('active');
         }
     }
-
-    console.log(currentCheckedStates);
     
     if(!valid){
         clearText();
