@@ -3,6 +3,11 @@ label {
     font: 1rem 'Fira Sans', sans-serif;
 }
 
+#UI{
+    position:fixed;
+    top:0px;
+}
+
 input,
 label {
     margin: .4rem 0;
@@ -20,6 +25,22 @@ label {
     font-weight: 200;
     vertical-align: middle;
     position:absolute;
+}
+
+#errorMessage{
+    color:rgba(0,0,0,0); 
+}
+
+#errorMessage.showing{
+    color:red;
+}
+
+.invalidInput{
+    background-color: rgb(238, 77, 77);
+}
+
+.active{
+    background-color: rgb(58, 206, 83);
 }
 
 .final{
