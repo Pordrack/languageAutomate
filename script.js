@@ -57,6 +57,9 @@ function Transition(startState, endState, characters) {
         if(distanceBetweenTheTwo>0)
             offset=1.0/(0.0002*distanceBetweenTheTwo)
 
+        offset*=(window.innerHeight/1080);
+        console.log(window.innerHeight);
+
         ControlPointX += offset * Math.cos(angleBetweenTheTwo - 0.5 * Math.PI);
         ControlPointY += offset * Math.sin(angleBetweenTheTwo - 0.5 * Math.PI);
         //Puis on le clone en 2 pour avoir un effet "boucle"

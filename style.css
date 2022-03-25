@@ -15,13 +15,13 @@ label {
 
 .state {
     border-radius: 50%;
-    width:30px;
-    height: 30px;
+    width:3vh;
+    height: 3vh;
     background-color: aquamarine;
     border: 1mm ridge rgba(56, 56, 56, 0.521);
     text-align: center;
-    line-height: 30px;
-    font-size: x-large;
+    line-height: 3vh;
+    font-size: 3vh;
     font-weight: 200;
     vertical-align: middle;
     position:absolute;
@@ -29,10 +29,12 @@ label {
 
 #errorMessage{
     color:rgba(0,0,0,0); 
+    font-size: 0px;
 }
 
 #errorMessage.showing{
     color:red;
+    font-size: medium;
 }
 
 .invalidInput{
