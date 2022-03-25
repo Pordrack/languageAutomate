@@ -72,8 +72,8 @@ function Transition(startState, endState, characters) {
         //On calcul aussi les coordonnés pour l'étiquette
         let radius = 0.5 * this.endState.circleNode.getBoundingClientRect().width;
         let angleFromStart=Math.atan2(ControlPoint1Y-startingPointY,ControlPoint1X-startingPointX)
-        let labelX = startingPointX + radius*1.8 * Math.cos(angleFromStart)//ControlPoint2X//ControlPointX - 10 * Math.cos(angleBetweenTheTwo + 0.5 * Math.PI);
-        let labelY = startingPointY + radius*1.8 * Math.sin(angleFromStart)//ControlPoint2Y//ControlPointY - 10 * Math.sin(angleBetweenTheTwo + 0.5 * Math.PI);
+        let labelX = startingPointX + radius*2 * Math.cos(angleFromStart)//ControlPoint2X//ControlPointX - 10 * Math.cos(angleBetweenTheTwo + 0.5 * Math.PI);
+        let labelY = startingPointY + radius*2 * Math.sin(angleFromStart)//ControlPoint2Y//ControlPointY - 10 * Math.sin(angleBetweenTheTwo + 0.5 * Math.PI);
 
         //On calcul les coordonnées des fleches
         let angleFromOffset = Math.atan2(endingPointY - ControlPoint2Y, endingPointX - ControlPoint2X);
