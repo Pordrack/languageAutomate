@@ -53,7 +53,8 @@ label {
     height: 80vh;
     width: 80vh;
     position: fixed;
-    right: 0px;
+    left: 50%;
+    transform: translate(-50%, 0);
     bottom: 0px;
 }
 
