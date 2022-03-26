@@ -207,6 +207,10 @@ function getPositionOnCircle(circleDiv, objectToPlace, angle) {
     let posX = centerX + Math.cos(angle) * distance - 0.5 * objectBoundbox.width;
     let posY = centerY + Math.sin(angle) * distance - 0.5 * objectBoundbox.width;
 
+    //Comme la circle div est un parent, enlevons le de l'equation!
+    posX-=circleBoundbox.left;
+    posY-=circleBoundbox.top;
+
     return [posX, posY];
 }
 
