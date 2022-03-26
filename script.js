@@ -462,3 +462,5 @@ window.addEventListener("resize", function () {
 
     //generateAutomata();
 }); 
+
+generateAutomata();
