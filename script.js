@@ -264,8 +264,21 @@ function generateAutomata() {
             skipState=true;
         }
         
+        //On gère les -, ne fonctionne en coordination avec rien
+        if(previousChar=='-'){
+            startChar=states[currentState-1].transitions[0].characters[states[currentState-1].transitions[0].characters.length-1];
+            endChar=char;
+
+            for(let asciiCode=startChar.charCodeAt(0)+1; asciiCode<=endChar.charCodeAt(0);asciiCode++){
+                states[currentState-1].transitions[0].characters.push(String.fromCharCode(asciiCode));
+            }
+
+            
+            skipState=true;
+        }
+
         //On gère les et et les ou, ne fonctionne en coordination avec rien
-        if(char==',' || char=='|'){
+        if(char==',' || char=='|' || char=="-"){
             skipState=true;
         }
 
