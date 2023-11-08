@@ -249,10 +249,11 @@ function generateAutomata() {
     //C'ici ici qu'on stock les états AVANT des segments en [] (dernier=plus en "profondeur")
     let lastPreviousStates=[];
     //C'est ici qu'on stock les caracteres en début de segments en [] (dernier=plus en profondeur)
-    let lastFirstChar=[];
+    let lastFirstCharGroups=[];
     //C'est ici qu'on stock un groupe de [] qui vient de s'achever, pour les + et moins qui seraient intéréssés
     let currentGroupOfState=null;
     let previousChar=null;
+    let previousGroupOfChar=[];
     let willHaveToCreateShortcut=false;
     //Va-t-on devoir creer un groupe ? Et combien ? Sert pour les [[ici]] truc imbriqué dé le début
     let groupsToBegin=0;
@@ -283,10 +284,16 @@ function generateAutomata() {
             //Il y'ait un [ juste après un *...]
         }
 
+        function addAlternativeChar(alternativeChar){
+            states[currentState-1].transitions[0].characters.push(alternativeChar);
+            previousGroupOfChar.push(alternativeChar);
+            lastFirstCharGroups[lastFirstCharGroups.length-1].push(alternativeChar);
+            skipState=true;
+        }
+
         //On gère les et les ou, ne fonctionne en coordination avec rien
         if(previousChar==',' || previousChar=="|"){
-            states[currentState-1].transitions[0].characters.push(char)
-            skipState=true;
+            addAlternativeChar(char);
         }
         
         //On gère les -, ne fonctionne en coordination avec rien
@@ -295,10 +302,9 @@ function generateAutomata() {
             endChar=char;
 
             for(let asciiCode=startChar.charCodeAt(0)+1; asciiCode<=endChar.charCodeAt(0);asciiCode++){
-                states[currentState-1].transitions[0].characters.push(String.fromCharCode(asciiCode));
+                addAlternativeChar(String.fromCharCode(asciiCode));
             }
 
-            
             skipState=true;
         }
 
@@ -325,7 +331,7 @@ function generateAutomata() {
             //Une fois la [ fini, on stock les états précédents et premiers stockés en dernier avat de les virer
             currentGroupOfState={
                 'previousState':lastPreviousStates.pop(),
-                'firstChar':lastFirstChar.pop(),
+                'firstCharGroup':lastFirstCharGroups.pop(),
                 'firstState':lastStates.pop()
             }
             
@@ -339,16 +345,17 @@ function generateAutomata() {
 
             //Si c'est un groupe on reviens au début du groupe pour boucler
             if(currentGroupOfState!=null){
-                states[currentState].addTransition(currentGroupOfState.firstState,currentGroupOfState.firstChar)
+                states[currentState].addTransition(currentGroupOfState.firstState,currentGroupOfState.firstCharGroup)
             }else{
                 //Sinon on boucle sur soi meme
-                states[currentState].addTransition(states[currentState],previousChar)
+                states[currentState].addTransition(states[currentState],previousGroupOfChar)
             }
 
             skipState=true;
         }
 
         previousChar=char
+        previousGroupOfChar=[char]
 
         if(skipState){
             continue;
@@ -379,7 +386,7 @@ function generateAutomata() {
         for (let i = 0; i < groupsToBegin; i++) {
             console.log(char);
             lastStates.push(newState);
-            lastFirstChar.push(char);
+            lastFirstCharGroups.push([char]);
             //console.log("began group !");
         }
         groupsToBegin=0;
