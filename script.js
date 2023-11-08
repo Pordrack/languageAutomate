@@ -19,6 +19,7 @@ function arrayRemove(arr, value) {
 function Transition(startState, endState, characters) {
     this.startState = startState;
     this.endState = endState;
+    
     this.characters = characters;
 
     this.drawTransition = function () {
@@ -114,10 +115,34 @@ function Transition(startState, endState, characters) {
         ctx.fillStyle = "black"
         ctx.strokeStyle = "white"
         ctx.lineWidth = 3;
-        let label = characters[0];
-        for (const char of characters.slice(1)) {
-            label += "," + char;
+        let label = "";
+
+        let separator="" //By default, characters are separated by "," on the label
+        for (let i in characters) {
+            let lastChar=(i>0) ? characters[i-1] : null;
+            let char = characters[i];
+            let nextChar = (i<characters.length-1) ? characters[Number(i)+Number(1) ] : null;
+
+            //But if we have consecutives characters (a,b,c,d,e for example), we'll skip all the intermediates one and use "-" as the separator between the first and last one
+            if(lastChar && char.charCodeAt(0)-lastChar.charCodeAt(0)<=1){
+                separator="-";
+                lastChar=char;
+
+                //If it's the last consecutive character of it's serie we must write it
+                if(!nextChar || nextChar.charCodeAt(0)-char.charCodeAt(0)>1){
+                    label += separator + char;
+                    separator=",";
+                }
+                
+                continue;
+            }
+
+            label += separator + char;
+            
+            lastChar=char;
+            separator=",";
         }
+
         ctx.beginPath();
         ctx.font = '20px sans';
         //On calcul la taille du texte pour le centrer
