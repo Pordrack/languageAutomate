@@ -96,11 +96,9 @@ function Transition(startState, endState, characters) {
         ctx.strokeStyle = "black"
         ctx.beginPath();
         ctx.moveTo(startingPointX, startingPointY);
-        //Courbe
+
         ctx.bezierCurveTo(ControlPoint1X, ControlPoint1Y, ControlPoint2X, ControlPoint2Y, endingPointX, endingPointY);
-        //ctx.quadraticCurveTo(ControlPointX,ControlPointY,endingPointX,endingPointY);
-        //ctx.lineTo(ControlPointX,ControlPointY);
-        //ctx.lineTo(endingPointX,endingPointY);
+
         ctx.stroke();
         //Fleche pour la direction
         ctx.fillStyle = "black"
@@ -124,7 +122,7 @@ function Transition(startState, endState, characters) {
             let nextChar = (i<characters.length-1) ? characters[Number(i)+Number(1) ] : null;
 
             //But if we have consecutives characters (a,b,c,d,e for example), we'll skip all the intermediates one and use "-" as the separator between the first and last one
-            if(lastChar && char.charCodeAt(0)-lastChar.charCodeAt(0)<=1){
+            if(lastChar && char.charCodeAt(0)-lastChar.charCodeAt(0)==1){
                 separator="-";
                 lastChar=char;
 
@@ -147,8 +145,8 @@ function Transition(startState, endState, characters) {
         ctx.font = '20px sans';
         //On calcul la taille du texte pour le centrer
         let metrics=ctx.measureText(label);
-        ctx.strokeText(label, labelX-0.5*metrics.width, labelY+10);
-        ctx.fillText(label, labelX-0.5*metrics.width, labelY+10);
+        ctx.strokeText(label, labelX-0.5*metrics.width, labelY+15);
+        ctx.fillText(label, labelX-0.5*metrics.width, labelY+15);
     }
 }
 
