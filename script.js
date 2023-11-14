@@ -285,7 +285,8 @@ function generateAutomata() {
         }
 
         function addAlternativeChar(alternativeChar){
-            states[currentState-1].transitions[0].characters.push(alternativeChar);
+            let lastTransition=states[currentState-1].transitions.length-1;
+            states[currentState-1].transitions[lastTransition].characters.push(alternativeChar);
             previousGroupOfChar.push(alternativeChar);
             lastFirstCharGroups[lastFirstCharGroups.length-1].push(alternativeChar);
             skipState=true;
@@ -311,6 +312,7 @@ function generateAutomata() {
         //On gère les et et les ou, ne fonctionne en coordination avec rien
         if(char==',' || char=='|' || char=="-"){
             skipState=true;
+            console.log("Resolving "+char+" after"+previousChar);
         }
 
         if(char=='['){
@@ -363,14 +365,17 @@ function generateAutomata() {
 
         if(willHaveToCreateShortcut){
             if(currentGroupOfState!=null){
-                currentGroupOfState.previousState.addTransition(newState,[char]);
+                currentGroupOfState.previousState.addTransition(newState,previousGroupOfChar);
+                console.log("previous group of char")
+                console.log(previousGroupOfChar)
+                console.log("shortcut b")
             }else{
-                states[currentState-1].addTransition(newState,[char]);
+                states[currentState-1].addTransition(newState,previousGroupOfChar);
                 //En plus de skipper, si là on parle d'un état final alors on peut terminer sans boucler
                 //Malheuresement ça ne marche pas, car on ne set le final qu'après avoir scanné toute l'exp
                 if(newState.isFinal){
                     states[currentState-1].isFinal=true;
-                    console.log("test");
+                    console.log("shortcut");
                 }
             }
             willHaveToCreateShortcut=false;
