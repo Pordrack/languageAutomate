@@ -16,11 +16,11 @@ function arrayRemove(arr, value) {
 }
 
 //Represente les fleches entres les ronds
-function Transition(startState, endState, characters) {
+function Transition(startState, endState, charGroup) {
     this.startState = startState;
     this.endState = endState;
     
-    this.characters = characters;
+    this.charGroup = charGroup;
 
     this.drawTransition = function () {
         let canvaBoundingBox = mainCanva.getBoundingClientRect();
@@ -116,10 +116,10 @@ function Transition(startState, endState, characters) {
         let label = "";
 
         let separator="" //By default, characters are separated by "," on the label
-        for (let i in characters) {
-            let lastChar=(i>0) ? characters[i-1] : null;
-            let char = characters[i];
-            let nextChar = (i<characters.length-1) ? characters[Number(i)+Number(1) ] : null;
+        for (let i in charGroup) {
+            let lastChar=(i>0) ? charGroup.chars[i-1] : null;
+            let char = charGroup.chars[i];
+            let nextChar = (i<charGroup.chars.length-1) ? charGroup.chars[Number(i)+Number(1) ] : null;
 
             //But if we have consecutives characters (a,b,c,d,e for example), we'll skip all the intermediates one and use "-" as the separator between the first and last one
             if(lastChar && char.charCodeAt(0)-lastChar.charCodeAt(0)==1){
@@ -203,6 +203,19 @@ function State(name, position, isFinal) {
     }
 }
 
+//Represente un groupe de charactère, utilisé pour les transitions etc
+function CharGroup(char=null){
+    this.chars=[];
+
+    if(char){
+        this.addChar(char);
+    }
+    
+    this.addChar = function(newChar){
+        this.chars.push(char);
+    }
+}
+
 startState = new State(0, 0, true);
 states = [startState];
 currentState = 0;
@@ -251,7 +264,7 @@ function generateAutomata() {
     //C'est ici qu'on stock un groupe de [] qui vient de s'achever, pour les + et moins qui seraient intéréssés
     let currentGroupOfState=null;
     let previousChar=null;
-    let previousGroupOfChar=[];
+    let previousGroupOfChar=CharGroup();
     let willHaveToCreateShortcut=false;
     //Va-t-on devoir creer un groupe ? Et combien ? Sert pour les [[ici]] truc imbriqué dé le début
     let groupsToBegin=0;
